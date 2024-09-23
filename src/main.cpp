@@ -57,6 +57,11 @@ struct_response data_response;
 unsigned long t_wait_answer_start;
 void loop() {
   if (xQueueReceive(messageQueue, &event, portMAX_DELAY) == pdTRUE) {
+    // clear late incoming serial data
+    while (UartSerial.available() > 0) {
+      UartSerial.read();
+    }
+
     // print message to serial bus
     UartSerial.println(event.message);
     Serial.println(event.message);
@@ -78,8 +83,7 @@ void loop() {
       delayMicroseconds(1);
     }
 
-    if (UartSerial.available() > 0) {
-      UartSerial.read();
+    if (UartSerial.available() > 0 && UartSerial.read() == ((byte) '+')) {
       data_response.handled = true;
     }
     else {
