@@ -4,7 +4,7 @@ String jsonstring;
 JsonDocument jsondoc;
 struct_response data_response;
 
-#define ESPNOW_ID "doorbell" // button id, max 32 chars
+#define ESPNOW_ID "doorbell" // button id
 uint8_t receiver_address[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; // replace with mac address of receiver
 
 bool espnow_answer_received = false;
@@ -60,16 +60,17 @@ void setup(){
 
     // Fill json doc with values and serialize to String
     jsondoc["id"] = ESPNOW_ID;
+    jsondoc["type"] = "button";
     jsondoc["event"] = "button_pressed";
     jsondoc["batterylevel"] = get_battery_percentage();
     serializeJson(jsondoc, jsonstring);
 
     set_fastled(CRGB::MediumBlue);
-    esp_now_send(receiver_address, (uint8_t *) jsonstring.c_str(), jsonstring.length());
+    esp_now_send(NULL, (uint8_t *) jsonstring.c_str(), jsonstring.length());
 
     // wait on espnow answer
     unsigned long t_wait_answer_start = millis();
-    while (!espnow_answer_received && millis() <= t_wait_answer_start + 400){
+    while (!espnow_answer_received && millis() <= t_wait_answer_start + 100){
       delayMicroseconds(1);
     }
 

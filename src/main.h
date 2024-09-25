@@ -7,6 +7,8 @@
 #define RESPONSE_MAXDELAY 400
 #define INCOMING_QUEUE_SIZE 100
 
+#define ACK 0x06
+
 typedef struct {
     bool handled;
 } struct_response;

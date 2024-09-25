@@ -10,7 +10,7 @@ void esp_now_receive_callback(const uint8_t* mac, const uint8_t* data, int len) 
   // queue message for processing
   incoming_message_event newEvent;
   memcpy(&newEvent.mac, mac, sizeof(newEvent.mac));
-  newEvent.message = String((char*) data); // convert data to string
+  newEvent.message = String((char*) data, len); // convert data to string
   if (xQueueSend(messageQueue, &newEvent, RESPONSE_MAXDELAY) != pdTRUE) {
     UartSerial.printf("ERROR:Add to queue failed\r\n");
     Serial.println("ERROR:Add to queue failed");
@@ -61,6 +61,9 @@ void loop() {
     while (UartSerial.available() > 0) {
       UartSerial.read();
     }
+    while (Serial.available() > 0) {
+      Serial.read();
+    }
 
     // print message to serial bus
     UartSerial.println(event.message);
@@ -79,12 +82,15 @@ void loop() {
 
     // wait on serial acknowledgement for a maximum of 50 milliseconds
     t_wait_answer_start = millis();
-    while(UartSerial.available() == 0 && millis() <= t_wait_answer_start + 50) {
+    while(UartSerial.available() == 0 && Serial.available() == 0 && millis() <= t_wait_answer_start + 50) {
       delayMicroseconds(1);
     }
 
-    if (UartSerial.available() > 0 && UartSerial.read() == ((byte) '+')) {
-      data_response.handled = true;
+    if (UartSerial.available() > 0) {
+      data_response.handled = (UartSerial.read() == ACK);
+    }
+    else if (Serial.available() > 0) {
+      data_response.handled = (Serial.read() == ACK);
     }
     else {
       data_response.handled = false;
