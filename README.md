@@ -1,7 +1,6 @@
 # ESP-NOW Receiver
 This is a project that uses an ESP32 board as a receiver for ESP-NOW messages sent by other ESP boards and passes the data onto serial, either via USB or UART.  
 Mostly as a fun project to avoid wifi config on ESP32 sensors.  
-I'm currently only able to read acks from GPIO because I haven't had time to look into how to support reading from both serial interfaces at the same time.
 
 ## How to connect ESP32 to Raspberry PI GPIOs:
 Connect ESP32 RX to GPIO4 (UART3 TX), and TX to GPIO5 (UART3 RX)  
