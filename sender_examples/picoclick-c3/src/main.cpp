@@ -5,7 +5,7 @@ JsonDocument jsondoc;
 struct_response data_response;
 
 #define ESPNOW_ID "doorbell" // button id
-uint8_t receiver_address[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; // replace with mac address of receiver
+const uint8_t receiver_address[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; // replace with mac address of receiver to not broadcast
 
 bool espnow_answer_received = false;
 
@@ -46,7 +46,6 @@ void setup(){
   }
   
   esp_now_peer_info_t peerInfo;
-
   memcpy(peerInfo.peer_addr, receiver_address, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
@@ -66,7 +65,7 @@ void setup(){
     serializeJson(jsondoc, jsonstring);
 
     set_fastled(CRGB::MediumBlue);
-    esp_now_send(NULL, (uint8_t *) jsonstring.c_str(), jsonstring.length());
+    esp_now_send(receiver_address, (uint8_t *) jsonstring.c_str(), jsonstring.length());
 
     // wait on espnow answer
     unsigned long t_wait_answer_start = millis();
